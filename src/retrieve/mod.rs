@@ -1,6 +1,12 @@
 pub struct Retriever {
 }
 
-pub struct Server {
-    retriever: Retriver
+impl Retriever {
+    pub fn make_dictionary(&self) -> &Self {
+        self
+    }
+
+    pub fn retrieve(&self, query: &str) -> Vec<u32> {
+        vec![]
+    }
 }

@@ -4,6 +4,7 @@ mod retrieve;
 use std::thread;
 use std::net::{TcpListener, TcpStream, Shutdown};
 use std::io::{Read, Write};
+use index::Indexer;
 
 fn handle_client(mut stream: TcpStream) {
     let mut data = [0 as u8; 50];
@@ -22,6 +23,11 @@ fn handle_client(mut stream: TcpStream) {
 }
 
 fn main() -> std::io::Result<()> {
+    let indexer = Indexer::new();
+    indexer.read("hello")
+        .index()
+        .save();
+
     let listener = TcpListener::bind("127.0.0.1:3997")?;
     for stream in listener.incoming() {
         handle_client(stream?);
