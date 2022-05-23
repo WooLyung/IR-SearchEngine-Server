@@ -1,7 +1,6 @@
-pub struct VocaNode<'a> {
-    left: Option<Box<VocaNode<'a>>>,
-    right: Option<Box<VocaNode<'a>>>,
-    term: &'a str,
-    frequency: u32,
-    ptr: ()
+pub struct ListNode {
+    pub link: Option<Box<ListNode>>,
+    pub term: String,
+    pub frequency: u32,
+    pub ptr: ()
 }

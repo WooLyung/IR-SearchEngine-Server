@@ -23,8 +23,9 @@ fn handle_client(mut stream: TcpStream) {
 }
 
 fn main() -> std::io::Result<()> {
-    let indexer = Indexer::new();
+    let mut indexer = Indexer::new();
     indexer.read("hello")
+        .lemmatize()
         .index()
         .save();
 
