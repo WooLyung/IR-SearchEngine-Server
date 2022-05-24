@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use crate::index::comp::ListNode;
+use crate::index::comp::{ListNode, Posting};
 
 mod comp;
 
@@ -57,15 +57,34 @@ impl Indexer {
 
 impl Dictionary {
     pub fn insert(&mut self, term: String, doc: u32) {
-        match self.head {
-            Some(_) => {
+        match &self.head {
+            Some(head) => {
+                if term < head.term {
+                    let node = Some(Box::new(ListNode {
+                        link: Some(self.head.unwrap()),
+                        term,
+                        frequency: 1,
+                        ptr: Box::new(Posting {
+                            link: None,
+                            id: doc,
+                            frequency: 1
+                        })
+                    }));
+                }
+                else {
+
+                }
             }
             None => {
                 self.head = Some(Box::new(ListNode {
                     link: None,
-                    term: term,
-                    frequency: 0,
-                    ptr: ()
+                    term,
+                    frequency: 1,
+                    ptr: Box::new(Posting {
+                        link: None,
+                        id: doc,
+                        frequency: 1
+                    })
                 }));
             }
         }
