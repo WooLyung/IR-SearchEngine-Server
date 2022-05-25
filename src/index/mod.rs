@@ -1,4 +1,7 @@
 use std::collections::HashMap;
+use std::fs::File;
+use std::io::Read;
+use regex::Regex;
 
 pub struct Indexer {
     pair_list: Vec<(String, u32)>,
@@ -15,12 +18,33 @@ impl Indexer {
 
     // read corpus text files
     pub fn read(&mut self, fname: &str) -> &mut Self {
-        self.pair_list.push((String::from("abc"), 100));
-        self.pair_list.push((String::from("def"), 21));
-        self.pair_list.push((String::from("ghi"), 0));
-        self.pair_list.push((String::from("abc"), 4));
-        self.pair_list.push((String::from("abc"), 2));
-        self.pair_list.push((String::from("ghi"), 3));
+        let mut file = File::open(fname).expect("file not found.");
+        let mut contents = String::new();
+        file.read_to_string(&mut contents).expect("Something went wrong reading the file");
+
+        let mut doc_id = 0;
+        let regex = Regex::new(r"<title>.*</title>").unwrap();
+
+        let lines: Vec<&str> = contents.split("\n").collect();
+        for line in lines {
+            if regex.is_match(line.trim()) {
+                let str = line.replace("<title>", "")
+                    .replace("</title>", "");
+                let parts: Vec<&str> = str.split(". ").collect();
+
+                doc_id = parts[0].parse().unwrap();
+            }
+            else {
+                let tokens: Vec<&str> = line.split(" ")
+                    .map(|x| x.trim())
+                    .filter(|x| !x.is_empty())
+                    .collect();
+                for token in tokens {
+                    self.pair_list.push((String::from(token), doc_id));
+                }
+            }
+        }
+
         self
     }
 
