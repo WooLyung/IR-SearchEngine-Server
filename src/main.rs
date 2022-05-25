@@ -27,6 +27,8 @@ fn main() -> std::io::Result<()> {
     indexer.read("hello")
         .lemmatize()
         .index()
+        .sort()
+        .print()
         .save();
 
     let listener = TcpListener::bind("127.0.0.1:3997")?;
