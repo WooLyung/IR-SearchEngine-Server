@@ -5,7 +5,7 @@ use regex::Regex;
 
 pub struct Indexer {
     pair_list: Vec<(String, u32)>,
-    terms: Vec<(String, Vec<u32>)>
+    terms: Vec<(String, Vec<(u32, u32)>)>
 }
 
 impl Indexer {
@@ -63,10 +63,17 @@ impl Indexer {
             let doc = &pair.1;
             match self.terms.iter_mut().find(|x| x.0 == *term) {
                 Some(postings) => {
-                    postings.1.push(*doc);
+                    match postings.1.iter_mut().find(|x| (**x).0 == *doc) {
+                        Some(posting) => {
+                            posting.1 += 1;
+                        }
+                        None => {
+                            postings.1.push((*doc, 1));
+                        }
+                    }
                 }
                 None => {
-                    self.terms.push((String::from(term), vec![*doc]));
+                    self.terms.push((String::from(term), vec![(*doc, 1)]));
                 }
             }
         }
@@ -88,7 +95,7 @@ impl Indexer {
         for postings in self.terms.iter() {
             println!("{} : ", postings.0);
             for posting in postings.1.iter() {
-                print!("{} ", posting);
+                print!("{}:{} ", posting.0, posting.1);
             }
             println!();
         }
