@@ -27,6 +27,7 @@ fn main() -> std::io::Result<()> {
     indexer.read("corpus/nor_corpus.txt")
         .index()
         .sort()
+        .tfidf()
         .print()
         .save();
 

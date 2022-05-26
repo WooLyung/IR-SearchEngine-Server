@@ -1,11 +1,11 @@
-use std::collections::HashMap;
 use std::fs::File;
 use std::io::Read;
 use regex::Regex;
+use libm::log;
 
 pub struct Indexer {
     pair_list: Vec<(String, u32)>,
-    terms: Vec<(String, Vec<(u32, u32)>)>
+    terms: Vec<(String, Vec<(u32, f64)>)>
 }
 
 impl Indexer {
@@ -46,15 +46,15 @@ impl Indexer {
                 Some(postings) => {
                     match postings.1.iter_mut().find(|x| (**x).0 == *doc) {
                         Some(posting) => {
-                            posting.1 += 1;
+                            posting.1 += 1.0;
                         }
                         None => {
-                            postings.1.push((*doc, 1));
+                            postings.1.push((*doc, 1.0));
                         }
                     }
                 }
                 None => {
-                    self.terms.push((String::from(term), vec![(*doc, 1)]));
+                    self.terms.push((String::from(term), vec![(*doc, 1.0)]));
                 }
             }
         }
@@ -63,9 +63,9 @@ impl Indexer {
 
     // sort dictionary, posting lists
     pub fn sort(&mut self) -> &mut Self {
-        self.terms.sort();
+        self.terms.sort_by(|x, y| x.0.cmp(&y.0));
         for postings in self.terms.iter_mut() {
-            postings.1.sort()
+            postings.1.sort_by(|x, y| x.0.cmp(&y.0));
         }
 
         self
@@ -79,6 +79,29 @@ impl Indexer {
                 print!("{}:{} ", posting.0, posting.1);
             }
             println!();
+        }
+
+        self
+    }
+
+    // calculate tf-idf
+    pub fn tfidf(&mut self) -> &mut Self {
+        let N = self.terms.iter()
+            .max_by(|x, y| x.1.len().cmp(&y.1.len()))
+            .unwrap()
+            .1.len();
+
+        for postings in self.terms.iter_mut() {
+            let df = postings.1.len();
+            let idf = log((N as f64) / (df as f64));
+
+            for posting in postings.1.iter_mut() {
+                let tf = posting.1;
+                let wtf = 1.0 + log(tf as f64);
+                let tfidf = wtf * idf;
+
+                posting.1 = tfidf;
+            }
         }
 
         self
