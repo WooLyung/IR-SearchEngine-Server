@@ -28,6 +28,7 @@ fn main() -> std::io::Result<()> {
         .index()
         .sort()
         .tfidf()
+        .normalize()
         .print()
         .save();
 

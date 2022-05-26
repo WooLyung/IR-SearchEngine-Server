@@ -5,14 +5,16 @@ use libm::log;
 
 pub struct Indexer {
     pair_list: Vec<(String, u32)>,
-    terms: Vec<(String, Vec<(u32, f64)>)>
+    terms: Vec<(String, Vec<(u32, f64)>)>,
+    doc_count: usize
 }
 
 impl Indexer {
     pub fn new() -> Self {
         Indexer {
             pair_list: Vec::new(),
-            terms: Vec::new()
+            terms: Vec::new(),
+            doc_count: 0
         }
     }
 
@@ -28,6 +30,7 @@ impl Indexer {
             let mut tokens: Vec<&str> = line.trim().split(" ").collect();
             doc_id = tokens[0].parse().unwrap();
             tokens.remove(0);
+            self.doc_count += 1;
 
             for token in tokens {
                 self.pair_list.push((String::from(token), doc_id));
@@ -86,14 +89,14 @@ impl Indexer {
 
     // calculate tf-idf
     pub fn tfidf(&mut self) -> &mut Self {
-        let N = self.terms.iter()
+        let n = self.terms.iter()
             .max_by(|x, y| x.1.len().cmp(&y.1.len()))
             .unwrap()
             .1.len();
 
         for postings in self.terms.iter_mut() {
             let df = postings.1.len();
-            let idf = log((N as f64) / (df as f64));
+            let idf = log((n as f64) / (df as f64));
 
             for posting in postings.1.iter_mut() {
                 let tf = posting.1;
@@ -101,6 +104,29 @@ impl Indexer {
                 let tfidf = wtf * idf;
 
                 posting.1 = tfidf;
+            }
+        }
+
+        self
+    }
+
+    pub fn normalize(&mut self) -> &mut Self {
+        let mut sum: Vec<f64> = Vec::new();
+        sum.resize(self.doc_count + 1, 0.0);
+
+        for postings in self.terms.iter() {
+            for posting in postings.1.iter() {
+                if let Some(x) = sum.get_mut(posting.0 as usize) {
+                    *x += posting.1;
+                }
+            }
+        }
+
+        for postings in self.terms.iter_mut() {
+            for posting in postings.1.iter_mut() {
+                if let Some(x) = sum.get(posting.0 as usize) {
+                    posting.1 /= x;
+                }
             }
         }
 
