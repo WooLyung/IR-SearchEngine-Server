@@ -23,36 +23,17 @@ impl Indexer {
         file.read_to_string(&mut contents).expect("Something went wrong reading the file");
 
         let mut doc_id = 0;
-        let regex = Regex::new(r"<title>.*</title>").unwrap();
-
         let lines: Vec<&str> = contents.split("\n").collect();
         for line in lines {
-            if regex.is_match(line.trim()) {
-                let str = line.replace("<title>", "")
-                    .replace("</title>", "");
-                let parts: Vec<&str> = str.split(". ").collect();
+            let mut tokens: Vec<&str> = line.trim().split(" ").collect();
+            doc_id = tokens[0].parse().unwrap();
+            tokens.remove(0);
 
-                doc_id = parts[0].parse().unwrap();
-            }
-            else {
-                let tokens: Vec<&str> = line.split(" ")
-                    .map(|x| x.trim())
-                    .filter(|x| !x.is_empty())
-                    .collect();
-                for token in tokens {
-                    self.pair_list.push((String::from(token), doc_id));
-                }
+            for token in tokens {
+                self.pair_list.push((String::from(token), doc_id));
             }
         }
 
-        self
-    }
-
-    // lemmatization
-    pub fn lemmatize(&mut self) -> &mut Self {
-        self.pair_list = self.pair_list.iter().map(|x| {
-            (String::from(&x.0), &x.1 + 5)
-        }).collect();
         self
     }
 

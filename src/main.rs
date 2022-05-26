@@ -24,8 +24,7 @@ fn handle_client(mut stream: TcpStream) {
 
 fn main() -> std::io::Result<()> {
     let mut indexer = Indexer::new();
-    indexer.read("corpus/corpus.txt")
-        .lemmatize()
+    indexer.read("corpus/nor_corpus.txt")
         .index()
         .sort()
         .print()
