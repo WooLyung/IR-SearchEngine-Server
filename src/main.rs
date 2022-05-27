@@ -33,19 +33,21 @@ fn main() -> std::io::Result<()> {
         .index()
         .sort()
         .tfidf()
-        .normalize()
-        .print();
+        .normalize();
 
     let mut retriever = Retriever::new(&indexer);
 
     let output = Command::new("python")
-        .args(["./corpus/normalizer.py", "나는 자랑스러운 태극기 앞에 자유롭고 정의로운 대한민국의 무궁한 영광을 위하다."])
+        .args(["./corpus/normalizer.py", "자유 소프트웨어 운동과 대통령"])
         .output()
         .expect("error!!");
     let query = String::from_utf8(output.stdout).unwrap();
     println!("{}", &query);
 
-    retriever.retrieve(query);
+    let result = retriever.retrieve(query);
+    for num in result {
+        println!("{}", num);
+    }
 
     // let listener = TcpListener::bind("127.0.0.1:3997")?;
     // for stream in listener.incoming() {
