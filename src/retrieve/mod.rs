@@ -1,12 +1,17 @@
-pub struct Retriever {
+use crate::Indexer;
+
+pub struct Retriever<'a> {
+    indexer: &'a Indexer
 }
 
-impl Retriever {
-    pub fn make_dictionary(&self) -> &Self {
-        self
+impl<'a> Retriever<'a> {
+    pub fn new(indexer: &'a Indexer) -> Self {
+        Retriever {
+            indexer
+        }
     }
 
-    pub fn retrieve(&self, query: &str) -> Vec<u32> {
+    pub fn retrieve(&self, query: String) -> Vec<u32> {
         vec![]
     }
 }

@@ -2,6 +2,7 @@ use std::fs::File;
 use std::io::Read;
 use regex::Regex;
 use libm::log;
+use serde::Serializer;
 
 pub struct Indexer {
     pair_list: Vec<(String, u32)>,
@@ -89,14 +90,9 @@ impl Indexer {
 
     // calculate tf-idf
     pub fn tfidf(&mut self) -> &mut Self {
-        let n = self.terms.iter()
-            .max_by(|x, y| x.1.len().cmp(&y.1.len()))
-            .unwrap()
-            .1.len();
-
         for postings in self.terms.iter_mut() {
             let df = postings.1.len();
-            let idf = log((n as f64) / (df as f64));
+            let idf = log((self.doc_count as f64) / (df as f64));
 
             for posting in postings.1.iter_mut() {
                 let tf = posting.1;
@@ -130,11 +126,6 @@ impl Indexer {
             }
         }
 
-        self
-    }
-
-    // save inverted index as binary file
-    pub fn save(&mut self) -> &mut Self {
         self
     }
 }
