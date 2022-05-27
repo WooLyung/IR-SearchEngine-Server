@@ -1,5 +1,6 @@
 mod index;
 mod retrieve;
+mod document;
 
 use std::thread;
 use std::net::{TcpListener, TcpStream, Shutdown};
@@ -8,6 +9,7 @@ use std::process::Command;
 use std::str::from_utf8;
 use subprocess::Exec;
 use index::Indexer;
+use crate::document::Document;
 use crate::retrieve::Retriever;
 
 fn handle_client(mut stream: TcpStream) {
@@ -28,12 +30,14 @@ fn handle_client(mut stream: TcpStream) {
 
 fn main() -> std::io::Result<()> {
     let mut indexer = Indexer::new();
-
     indexer.read("corpus/nor_corpus.txt")
         .index()
         .sort()
         .tfidf()
         .normalize();
+
+    let mut docs = Document::new();
+    docs.read("corpus/corpus.txt");
 
     let mut retriever = Retriever::new(&indexer);
 
@@ -42,11 +46,10 @@ fn main() -> std::io::Result<()> {
         .output()
         .expect("error!!");
     let query = String::from_utf8(output.stdout).unwrap();
-    println!("{}", &query);
 
     let result = retriever.retrieve(query);
     for num in result {
-        println!("{}", num);
+        println!("{} {}", num, docs.get_doc(num).unwrap());
     }
 
     // let listener = TcpListener::bind("127.0.0.1:3997")?;
