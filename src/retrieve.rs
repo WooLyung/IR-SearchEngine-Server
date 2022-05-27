@@ -14,7 +14,9 @@ impl<'a> Retriever<'a> {
 
     // retrieve by ltc.nnc
     pub fn retrieve(&self, query: String) -> Vec<u32> {
-        let query_terms: HashSet<&str> = query.split(" ").collect();
+        let mut query_terms: HashSet<&str> = query.split(" ")
+            .map(|x| x.trim())
+            .collect();
         let mut scores: HashMap<u32, f64> = HashMap::new();
 
         for pair in self.indexer.terms.iter() {

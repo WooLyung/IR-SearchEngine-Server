@@ -42,7 +42,7 @@ fn main() -> std::io::Result<()> {
     let mut retriever = Retriever::new(&indexer);
 
     let output = Command::new("python")
-        .args(["./corpus/normalizer.py", "자유 소프트웨어 운동과 대통령"])
+        .args(["./corpus/normalizer.py", "대한민국의 정치가와 물리학자"])
         .output()
         .expect("error!!");
     let query = String::from_utf8(output.stdout).unwrap();
