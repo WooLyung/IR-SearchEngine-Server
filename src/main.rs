@@ -26,11 +26,19 @@ fn handle_client(mut stream: TcpStream, indexer: &Indexer, docs: &Document) {
             let query = String::from_utf8(output.stdout).unwrap();
 
             let result = retriever.retrieve(query);
+            let mut send_msg: String = String::new();
+            let mut i = 0;
+
             for num in result {
                 let str: &str = &*docs.get_doc(num).unwrap();
-                println!("{}", num.to_string() + " : " + str + "\n");
-                stream.write((num.to_string() + " : " + str + "\n").as_ref()).unwrap();
+                send_msg += &*(num.to_string() + " : " + str + "\n");
+
+                i += 1;
+                if i == 5 {
+                    break;
+                }
             }
+            stream.write(send_msg.as_ref());
 
             size != 0
         },
