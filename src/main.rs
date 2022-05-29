@@ -12,12 +12,26 @@ use index::Indexer;
 use crate::document::Document;
 use crate::retrieve::Retriever;
 
-fn handle_client(mut stream: TcpStream) {
+fn handle_client(mut stream: TcpStream, indexer: &Indexer, docs: &Document) {
     let mut data = [0 as u8; 50];
+
     while match stream.read(&mut data) {
         Ok(size) => {
-            println!("{}", from_utf8(&data[0..size]).unwrap());
-            stream.write(&data[0..size]).unwrap();
+            let mut retriever = Retriever::new(&indexer);
+
+            let output = Command::new("python")
+                .args(["./corpus/normalizer.py", from_utf8(&data[0..size]).unwrap()])
+                .output()
+                .expect("error!!");
+            let query = String::from_utf8(output.stdout).unwrap();
+
+            let result = retriever.retrieve(query);
+            for num in result {
+                let str: &str = &*docs.get_doc(num).unwrap();
+                println!("{}", num.to_string() + " : " + str + "\n");
+                stream.write((num.to_string() + " : " + str + "\n").as_ref()).unwrap();
+            }
+
             size != 0
         },
         Err(_) => {
@@ -39,22 +53,9 @@ fn main() -> std::io::Result<()> {
     let mut docs = Document::new();
     docs.read("corpus/corpus.txt");
 
-    let mut retriever = Retriever::new(&indexer);
-
-    let output = Command::new("python")
-        .args(["./corpus/normalizer.py", "대한민국의 정치가와 물리학자"])
-        .output()
-        .expect("error!!");
-    let query = String::from_utf8(output.stdout).unwrap();
-
-    let result = retriever.retrieve(query);
-    for num in result {
-        println!("{} {}", num, docs.get_doc(num).unwrap());
+    let listener = TcpListener::bind("127.0.0.1:3997")?;
+    for stream in listener.incoming() {
+        handle_client(stream?, &indexer, &docs);
     }
-
-    // let listener = TcpListener::bind("127.0.0.1:3997")?;
-    // for stream in listener.incoming() {
-    //     handle_client(stream?);
-    // }
     Ok(())
 }
