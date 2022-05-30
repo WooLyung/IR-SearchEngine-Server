@@ -26,5 +26,5 @@ if len(sys.argv) == 1:
                     output.write(' '.join(result))
 else:
     argv = ' '.join(sys.argv[1:])
-    result = list(map(lambda x: x[0].strip(), okt.pos(argv.strip(), norm=True, stem=True)))
+    result = list(map(lambda x: x[0].strip(), filter(lambda x: x[1] != 'Josa', okt.pos(argv.strip(), norm=True, stem=True))))
     print(' '.join(result))
