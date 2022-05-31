@@ -3,6 +3,10 @@ from konlpy.tag import Okt
 import re
 import sys
 
+def normalize(str):
+    return okt.pos(str, norm=True, stem=True)
+    
+
 okt = Okt()
 sys.stdout.reconfigure(encoding='utf-8')
 
@@ -22,9 +26,9 @@ if len(sys.argv) == 1:
                     first = False
 
                 elif line.strip() != '':
-                    result = list(map(lambda x: x[0].strip(), okt.pos(line, norm=True, stem=True)))
+                    result = list(map(lambda x: x[0].strip(), normalize(line)))
                     output.write(' '.join(result))
 else:
     argv = ' '.join(sys.argv[1:])
-    result = list(map(lambda x: x[0].strip(), filter(lambda x: x[1] != 'Josa', okt.pos(argv.strip(), norm=True, stem=True))))
+    result = list(map(lambda x: x[0].strip(), filter(lambda x: x[1] != 'Josa', normalize(argv.strip()))))
     print(' '.join(result))
