@@ -30,5 +30,5 @@ if len(sys.argv) == 1:
                     output.write(' '.join(result))
 else:
     argv = ' '.join(sys.argv[1:])
-    result = list(map(lambda x: x[0].strip(), filter(lambda x: x[1] != 'Josa', normalize(argv.strip()))))
+    result = list(map(lambda x: x[0].strip(), filter(lambda x: x[1] != '', normalize(argv.strip()))))
     print(' '.join(result))
