@@ -30,14 +30,18 @@ fn handle_client(mut stream: TcpStream, indexer: &Indexer, docs: &Document) {
             let mut i = 0;
 
             for num in result {
-                let str: &str = &*docs.get_doc(num).unwrap();
-                send_msg += &*(num.to_string() + " : " + str + "\n");
+                let pair: (String, String) = docs.get_doc(num).unwrap();
+                let content: String = String::from(&pair.1);
+                let title: String = String::from(&pair.0);
+
+                send_msg += &*format!("{}. {} : {}\n", num.to_string(), title, content);
 
                 i += 1;
                 if i == 5 {
                     break;
                 }
             }
+
             stream.write(send_msg.as_ref());
 
             size != 0

@@ -5,7 +5,7 @@ use regex::Regex;
 use crate::Indexer;
 
 pub struct Document {
-    postings: HashMap<u32, String>
+    postings: HashMap<u32, (String, String)>
 }
 
 impl Document{
@@ -15,10 +15,10 @@ impl Document{
         }
     }
 
-    pub fn get_doc(&self, doc_id: u32) -> Option<String> {
+    pub fn get_doc(&self, doc_id: u32) -> Option<(String, String)> {
         if self.postings.contains_key(&doc_id) {
-            let str = self.postings.get(&doc_id).unwrap();
-            return Some(str.to_string());
+            let &str = &self.postings.get(&doc_id).unwrap();
+            return Some((str.0.to_string(), str.1.to_string()));
         }
         else {
             return None;
@@ -43,11 +43,11 @@ impl Document{
 
                 doc_id = parts[0].parse().unwrap();
                 if !self.postings.contains_key(&doc_id) {
-                    self.postings.insert(doc_id, String::from(""));
+                    self.postings.insert(doc_id, (String::from(parts[1].trim()), String::from("")));
                 }
             }
             else {
-                (*self.postings.get_mut(&doc_id).unwrap()) += line.trim();
+                (*self.postings.get_mut(&doc_id).unwrap()).1 += line.trim();
             }
         }
     }

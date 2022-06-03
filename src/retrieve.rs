@@ -12,7 +12,7 @@ impl<'a> Retriever<'a> {
         }
     }
 
-    // retrieve by ltc.ntc
+    // retrieve by ltc.nnc
     pub fn retrieve(&self, query: String) -> Vec<u32> {
         let mut query_terms: HashSet<&str> = query.split(" ")
             .map(|x| x.trim())
