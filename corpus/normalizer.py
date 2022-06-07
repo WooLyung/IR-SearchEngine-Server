@@ -3,8 +3,19 @@ from konlpy.tag import Okt
 import re
 import sys
 
+def to_num(str):
+    result = ""
+    for c in str:
+        if c.isnumeric():
+            result += c
+
+    return result
+
 def normalize(str):
-    return okt.pos(str, norm=True, stem=True)
+    result = okt.pos(str, norm=True, stem=True)
+    result = list(map(lambda x: (to_num(x[0]), x[1]) if x[1] == 'Number' else x, result))
+
+    return result
 
 okt = Okt()
 sys.stdout.reconfigure(encoding='utf-8')
