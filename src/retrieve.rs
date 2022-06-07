@@ -1,4 +1,6 @@
 use std::collections::{HashMap, HashSet};
+use libm::log;
+use regex::internal::Input;
 use crate::Indexer;
 
 pub struct Retriever<'a> {
@@ -12,7 +14,7 @@ impl<'a> Retriever<'a> {
         }
     }
 
-    // retrieve by ltc.nnn
+    // retrieve by ltc.ntc
     pub fn retrieve(&self, query: String) -> Vec<u32> {
         let mut query_terms: HashSet<&str> = query.split(" ")
             .map(|x| x.trim())
@@ -26,7 +28,7 @@ impl<'a> Retriever<'a> {
             if query_terms.contains(term) {
                 for posting in posting_list.iter() {
                     let doc_id = posting.0;
-                    let score = posting.1;
+                    let score = posting.1 * log((self.indexer.doc_count / posting_list.len()) as f64) as f64;
 
                     if !scores.contains_key(&doc_id) {
                         scores.insert(doc_id, 0.0);

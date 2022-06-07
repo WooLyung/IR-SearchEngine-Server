@@ -7,7 +7,7 @@ use serde::Serializer;
 pub struct Indexer {
     pair_list: Vec<(String, u32)>,
     pub(crate) terms: Vec<(String, Vec<(u32, f64)>)>,
-    doc_count: usize
+    pub(crate) doc_count: usize
 }
 
 impl Indexer {
