@@ -34,7 +34,8 @@ fn handle_client(mut stream: TcpStream, indexer: &Indexer, docs: &Document) {
                 let content: String = String::from(&pair.1);
                 let title: String = String::from(&pair.0);
 
-                send_msg += &*format!("{}. {} : {}\n", num.to_string(), title, content);
+                // send_msg += &*format!("{}. {} : {}\n", num.to_string(), title, content);
+                send_msg += &*format!("{}\n", num.to_string());
 
                 i += 1;
                 if i == 5 {

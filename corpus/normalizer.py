@@ -5,7 +5,6 @@ import sys
 
 def normalize(str):
     return okt.pos(str, norm=True, stem=True)
-    
 
 okt = Okt()
 sys.stdout.reconfigure(encoding='utf-8')
