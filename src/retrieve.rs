@@ -29,6 +29,7 @@ impl<'a> Retriever<'a> {
                 for posting in posting_list.iter() {
                     let doc_id = posting.0;
                     let score = posting.1 * log((self.indexer.doc_count / posting_list.len()) as f64) as f64;
+                    //let score = posting.1;
 
                     if !scores.contains_key(&doc_id) {
                         scores.insert(doc_id, 0.0);
